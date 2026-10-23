@@ -1,0 +1,227 @@
+﻿<UserControl x:Class="SalesManagement_SysDev.SaleView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Background="#F0F5F8" Foreground="#123D54" FontFamily="Yu Gothic UI" FontSize="14"
+ UseLayoutRounding="True" SnapsToDevicePixels="True">
+ <UserControl.Resources>
+ 
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D8E4EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+        </Style>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#526D7D"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#123D54"/>
+            <Setter Property="BorderBrush" Value="#CBDCE5"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="InputBorder" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="InputBorder" Property="BorderBrush" Value="#91B6C4"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="InputBorder" Property="BorderBrush" Value="#10858D"/>
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter TargetName="InputBorder" Property="Background" Value="#EDF3F6"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="InputBorder" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#123D54"/>
+            <Setter Property="BorderBrush" Value="#CBDCE5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="DatePicker">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CBDCE5"/>
+            <Setter Property="SelectedDateFormat" Value="Short"/>
+            <Setter Property="Language" Value="ja-JP"/>
+        </Style>
+        <Style x:Key="Action" TargetType="Button">
+            <Setter Property="Background" Value="#10858D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#10858D"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Padding" Value="18,9"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="ButtonBorder" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <Border x:Name="HoverLayer" CornerRadius="6" Background="#123D54" Opacity="0" IsHitTestVisible="False"/>
+                            <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.09"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.19"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#123D54"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Secondary" TargetType="Button" BasedOn="{StaticResource Action}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#087880"/>
+            <Setter Property="BorderBrush" Value="#A8CDD2"/>
+        </Style>
+        <Style x:Key="Danger" TargetType="Button" BasedOn="{StaticResource Secondary}">
+            <Setter Property="Background" Value="#FFF8F8"/>
+            <Setter Property="Foreground" Value="#B54D56"/>
+            <Setter Property="BorderBrush" Value="#E5BDC2"/>
+        </Style>
+        <Style x:Key="Clear" TargetType="Button" BasedOn="{StaticResource Action}">
+            <Setter Property="Background" Value="#EFF3F6"/>
+            <Setter Property="Foreground" Value="#526D7D"/>
+            <Setter Property="BorderBrush" Value="#D7E1E7"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#EDF5F8"/>
+            <Setter Property="Foreground" Value="#426476"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="12,11"/>
+            <Setter Property="BorderBrush" Value="#D8E4EB"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Foreground" Value="#123D54"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D9ECEF"/>
+                    <Setter Property="Foreground" Value="#123D54"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridRow">
+            <Setter Property="MinHeight" Value="44"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#EDF6F7"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D9ECEF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="SelectionUnit" Value="FullRow"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F8FAFC"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#E7EEF2"/>
+            <Setter Property="EnableRowVirtualization" Value="True"/>
+            <Setter Property="CanUserReorderColumns" Value="False"/>
+        </Style>
+    
+ <XmlDataProvider x:Key="PreviewRows" XPath="/Rows/Row" IsAsynchronous="False">
+  <x:XData><Rows xmlns=""><Row><Id>101</Id><PreviousId>81</PreviousId><OrderId>61</OrderId><Client>株式会社さくら商事</Client><Office>東京営業所</Office><Date>2026/10/20</Date><Employee>山田 太郎</Employee><Status>計上済</Status><Total>73,000</Total><Details><Line><ProductId>1001</ProductId><ProductName>ワイヤレスマウス</ProductName><Color>ブラック</Color><Quantity>5</Quantity><UnitPrice>2,400</UnitPrice><Amount>12,000</Amount></Line><Line><ProductId>1002</ProductId><ProductName>USBキーボード</ProductName><Color>ホワイト</Color><Quantity>3</Quantity><UnitPrice>3,800</UnitPrice><Amount>11,400</Amount></Line><Line><ProductId>1003</ProductId><ProductName>液晶モニター 24型</ProductName><Color>ブラック</Color><Quantity>2</Quantity><UnitPrice>24,800</UnitPrice><Amount>49,600</Amount></Line></Details></Row><Row><Id>102</Id><PreviousId>82</PreviousId><OrderId>62</OrderId><Client>株式会社みらい産業</Client><Office>大阪営業所</Office><Date>2026/10/20</Date><Employee>山田 太郎</Employee><Status>計上済</Status><Total>29,600</Total><Details><Line><ProductId>1001</ProductId><ProductName>ワイヤレスマウス</ProductName><Color>ブラック</Color><Quantity>6</Quantity><UnitPrice>2,400</UnitPrice><Amount>14,400</Amount></Line><Line><ProductId>1002</ProductId><ProductName>USBキーボード</ProductName><Color>ホワイト</Color><Quantity>4</Quantity><UnitPrice>3,800</UnitPrice><Amount>15,200</Amount></Line></Details></Row><Row><Id>103</Id><PreviousId>83</PreviousId><OrderId>63</OrderId><Client>青葉テクノ株式会社</Client><Office>東京営業所</Office><Date>2026/10/20</Date><Employee>山田 太郎</Employee><Status>計上済</Status><Total>16,800</Total><Details><Line><ProductId>1001</ProductId><ProductName>ワイヤレスマウス</ProductName><Color>ブラック</Color><Quantity>7</Quantity><UnitPrice>2,400</UnitPrice><Amount>16,800</Amount></Line></Details></Row></Rows></x:XData>
+ </XmlDataProvider>
+ </UserControl.Resources>
+ <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+ <StackPanel Margin="24" MinWidth="940">
+  <Grid Margin="0,0,0,16">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <StackPanel><TextBlock Text="売上管理" FontSize="26" FontWeight="SemiBold"/><TextBlock Text="出荷処理から作成された売上と商品明細を確認します。" Foreground="#718894" Margin="0,5,0,0"/></StackPanel>
+   <Border Grid.Column="1" VerticalAlignment="Center" Background="#E2EFF1" CornerRadius="6" Padding="12,7"><TextBlock Text="画面サンプル ・ DB未接続" Foreground="#087880" FontSize="12"/></Border>
+  </Grid>
+  <WrapPanel Margin="0,0,0,16"><Border Background="#EDF3F6" CornerRadius="5" Padding="16,7" Margin="0,0,6,0"><TextBlock Text="01  受注" Foreground="#718894" FontWeight="SemiBold"/></Border><Border Background="#EDF3F6" CornerRadius="5" Padding="16,7" Margin="0,0,6,0"><TextBlock Text="02  注文" Foreground="#718894" FontWeight="SemiBold"/></Border><Border Background="#EDF3F6" CornerRadius="5" Padding="16,7" Margin="0,0,6,0"><TextBlock Text="03  出庫" Foreground="#718894" FontWeight="SemiBold"/></Border><Border Background="#EDF3F6" CornerRadius="5" Padding="16,7" Margin="0,0,6,0"><TextBlock Text="04  入荷" Foreground="#718894" FontWeight="SemiBold"/></Border><Border Background="#EDF3F6" CornerRadius="5" Padding="16,7" Margin="0,0,6,0"><TextBlock Text="05  出荷" Foreground="#718894" FontWeight="SemiBold"/></Border><Border Background="#10858D" CornerRadius="5" Padding="16,7" Margin="0,0,6,0"><TextBlock Text="06  売上" Foreground="White" FontWeight="SemiBold"/></Border></WrapPanel>
+  <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+   <StackPanel>
+    <TextBlock Text="検索条件" FontSize="17" Foreground="#10858D" FontWeight="SemiBold" Margin="0,0,0,14"/>
+    <UniformGrid Columns="4"><StackPanel Margin="0,0,14,12"><TextBlock Text="売上ID" Style="{StaticResource FieldLabelStyle}"/><TextBox x:Name="txtId" MaxLength="10"/></StackPanel><StackPanel Margin="0,0,14,12"><TextBlock Text="出荷ID" Style="{StaticResource FieldLabelStyle}"/><TextBox x:Name="txtPreviousId" MaxLength="10"/></StackPanel><StackPanel Margin="0,0,14,12"><TextBlock Text="顧客" Style="{StaticResource FieldLabelStyle}"/><ComboBox x:Name="cmbClient" SelectedIndex="0"><ComboBoxItem Content="すべて"/><ComboBoxItem Content="株式会社さくら商事"/><ComboBoxItem Content="株式会社みらい産業"/><ComboBoxItem Content="青葉テクノ株式会社"/></ComboBox></StackPanel><StackPanel Margin="0,0,14,12"><TextBlock Text="営業所" Style="{StaticResource FieldLabelStyle}"/><ComboBox x:Name="cmbOffice" SelectedIndex="0"><ComboBoxItem Content="すべて"/><ComboBoxItem Content="東京営業所"/><ComboBoxItem Content="大阪営業所"/></ComboBox></StackPanel><StackPanel Margin="0,0,14,12"><TextBlock Text="売上日（開始）" Style="{StaticResource FieldLabelStyle}"/><DatePicker x:Name="dpFrom"/></StackPanel><StackPanel Margin="0,0,14,12"><TextBlock Text="売上日（終了）" Style="{StaticResource FieldLabelStyle}"/><DatePicker x:Name="dpTo"/></StackPanel><StackPanel Margin="0,0,14,12"><TextBlock Text="担当者" Style="{StaticResource FieldLabelStyle}"/><ComboBox x:Name="cmbEmployee" SelectedIndex="0"><ComboBoxItem Content="すべて"/><ComboBoxItem Content="未担当"/><ComboBoxItem Content="山田 太郎"/></ComboBox></StackPanel><StackPanel Margin="0,0,14,12"><TextBlock Text="状態" Style="{StaticResource FieldLabelStyle}"/><ComboBox x:Name="cmbState" SelectedIndex="0"><ComboBoxItem Content="すべて"/><ComboBoxItem Content="計上済"/></ComboBox></StackPanel></UniformGrid>
+    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <TextBlock Text="ID・顧客・営業所・期間から対象の伝票を探します。" Foreground="#718894" FontSize="12" VerticalAlignment="Center"/>
+     <WrapPanel Grid.Column="1"><Button x:Name="btnList" Content="一覧表示" Style="{StaticResource Secondary}" Click="PreviewOnly_Click" Margin="0,0,8,0"/><Button x:Name="btnClear" Content="クリア" Style="{StaticResource Clear}" Click="PreviewOnly_Click" Margin="0,0,8,0"/><Button x:Name="btnSearch" Content="検索" Style="{StaticResource Action}" Click="PreviewOnly_Click"/></WrapPanel>
+    </Grid>
+   </StackPanel>
+  </Border>
+  <Border Style="{StaticResource Card}" Padding="0" Margin="0,0,0,12">
+   <StackPanel>
+    <Grid Margin="20,16"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="売上一覧" FontSize="17" FontWeight="SemiBold"/><TextBlock Grid.Column="1" Text="サンプル 3 件" Foreground="#718894" FontSize="12" VerticalAlignment="Center"/></Grid>
+    <DataGrid x:Name="gridData" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Source={StaticResource PreviewRows}}" SelectedIndex="0" Height="185" Margin="1,0,1,8"><DataGrid.Columns><DataGridTextColumn Header="売上ID" Binding="{Binding XPath=Id, Mode=OneWay}" Width="85"/><DataGridTextColumn Header="出荷ID" Binding="{Binding XPath=PreviousId, Mode=OneWay}" Width="85"/><DataGridTextColumn Header="顧客名" Binding="{Binding XPath=Client, Mode=OneWay}" Width="2*"/><DataGridTextColumn Header="営業所" Binding="{Binding XPath=Office, Mode=OneWay}" Width="*"/><DataGridTextColumn Header="売上日" Binding="{Binding XPath=Date, Mode=OneWay}" Width="110"/><DataGridTextColumn Header="担当者" Binding="{Binding XPath=Employee, Mode=OneWay}" Width="100"/><DataGridTextColumn Header="状態" Binding="{Binding XPath=Status, Mode=OneWay}" Width="90"/><DataGridTextColumn Header="売上金額（税抜）" Binding="{Binding XPath=Total, Mode=OneWay}" Width="140"/></DataGrid.Columns></DataGrid>
+   </StackPanel>
+  </Border>
+  <Border Style="{StaticResource Card}" DataContext="{Binding SelectedItem, ElementName=gridData}">
+   <StackPanel>
+    <Grid Margin="0,0,0,14"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <StackPanel Orientation="Horizontal"><TextBlock Text="商品明細" FontSize="20" FontWeight="SemiBold"/><Border Background="#E2EFF1" CornerRadius="5" Padding="10,5" Margin="12,0,0,0"><TextBlock Text="{Binding XPath=Status, Mode=OneWay}" Foreground="#087880" FontSize="12"/></Border></StackPanel>
+     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><TextBlock Text="売上ID：" Foreground="#718894"/><TextBlock Text="{Binding XPath=Id, Mode=OneWay}" FontWeight="SemiBold" Margin="0,0,20,0"/><TextBlock Text="出荷ID：" Foreground="#718894"/><TextBlock Text="{Binding XPath=PreviousId, Mode=OneWay}" FontWeight="SemiBold"/></StackPanel>
+    </Grid>
+    <Border Background="#F5F9FB" CornerRadius="6" Padding="14" Margin="0,0,0,14"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="顧客" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding XPath=Client, Mode=OneWay}" FontWeight="SemiBold"/></StackPanel><StackPanel Grid.Column="1"><TextBlock Text="営業所" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding XPath=Office, Mode=OneWay}"/></StackPanel><StackPanel Grid.Column="2"><TextBlock Text="担当者" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding XPath=Employee, Mode=OneWay}"/></StackPanel></Grid></Border>
+    <DataGrid x:Name="gridDetails" ItemsSource="{Binding XPath=Details/Line}" Height="188"><DataGrid.Columns><DataGridTextColumn Header="商品ID" Binding="{Binding XPath=ProductId, Mode=OneWay}" Width="90"/><DataGridTextColumn Header="商品名" Binding="{Binding XPath=ProductName, Mode=OneWay}" Width="2*"/><DataGridTextColumn Header="カラー" Binding="{Binding XPath=Color, Mode=OneWay}" Width="*"/><DataGridTextColumn Header="数量" Binding="{Binding XPath=Quantity, Mode=OneWay}" Width="85"/><DataGridTextColumn Header="単価（円）" Binding="{Binding XPath=UnitPrice, Mode=OneWay}" Width="110"/><DataGridTextColumn Header="金額（円）" Binding="{Binding XPath=Amount, Mode=OneWay}" Width="120"/></DataGrid.Columns></DataGrid>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0"><TextBlock Text="売上合計（税抜）" Foreground="#718894" VerticalAlignment="Center" Margin="0,0,16,0"/><TextBlock Text="{Binding XPath=Total, Mode=OneWay}" FontSize="24" FontWeight="SemiBold"/><TextBlock Text=" 円" VerticalAlignment="Center"/></StackPanel>
+    <Border BorderBrush="#E7EEF2" BorderThickness="0,1,0,0" Margin="0,16,0,0" Padding="0,14,0,0">
+     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <StackPanel Margin="0,0,20,0"><TextBlock Text="非表示理由" Style="{StaticResource FieldLabelStyle}"/><TextBox x:Name="txtReason" MaxLength="1000"/></StackPanel>
+      <WrapPanel Grid.Column="1" VerticalAlignment="Bottom"><Button x:Name="btnHide" Content="非表示" Style="{StaticResource Danger}" Click="PreviewOnly_Click"/></WrapPanel>
+     </Grid>
+    </Border>
+    <TextBlock Text="出荷確定で作成された売上を閲覧する画面です。" Foreground="#718894" FontSize="12" Margin="0,12,0,0" TextWrapping="Wrap"/>
+   </StackPanel>
+  </Border>
+ </StackPanel>
+ </ScrollViewer>
+</UserControl>

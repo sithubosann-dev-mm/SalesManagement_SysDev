@@ -1,0 +1,279 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#F0F5F8" Foreground="#123D54" FontFamily="Yu Gothic UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True" Loaded="View_Loaded" x:Class="SalesManagement_SysDev.ProductSearchView">
+    <UserControl.Resources>
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D8E4EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+        </Style>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#526D7D"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#123D54"/>
+            <Setter Property="BorderBrush" Value="#CBDCE5"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="InputBorder" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="InputBorder" Property="BorderBrush" Value="#91B6C4"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="InputBorder" Property="BorderBrush" Value="#10858D"/>
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter TargetName="InputBorder" Property="Background" Value="#EDF3F6"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="InputBorder" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#123D54"/>
+            <Setter Property="BorderBrush" Value="#CBDCE5"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="PasswordBorder" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="PasswordBorder" Property="BorderBrush" Value="#10858D"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="PasswordBorder" Property="Background" Value="#EDF3F6"/>
+                                <Setter TargetName="PasswordBorder" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#123D54"/>
+            <Setter Property="BorderBrush" Value="#CBDCE5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="DatePicker">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CBDCE5"/>
+            <Setter Property="SelectedDateFormat" Value="Short"/>
+            <Setter Property="Language" Value="ja-JP"/>
+        </Style>
+        <Style x:Key="EmployeeButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#10858D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#10858D"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Padding" Value="18,9"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="ButtonBorder" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <Border x:Name="HoverLayer" CornerRadius="6" Background="#123D54" Opacity="0" IsHitTestVisible="False"/>
+                            <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.09"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.19"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#123D54"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="OutlineButtonStyle" TargetType="Button" BasedOn="{StaticResource EmployeeButtonStyle}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#087880"/>
+            <Setter Property="BorderBrush" Value="#A8CDD2"/>
+        </Style>
+        <Style x:Key="ClearButtonStyle" TargetType="Button" BasedOn="{StaticResource EmployeeButtonStyle}">
+            <Setter Property="Background" Value="#EFF3F6"/>
+            <Setter Property="Foreground" Value="#526D7D"/>
+            <Setter Property="BorderBrush" Value="#D7E1E7"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#EDF5F8"/>
+            <Setter Property="Foreground" Value="#426476"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="12,11"/>
+            <Setter Property="BorderBrush" Value="#D8E4EB"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Foreground" Value="#123D54"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D9ECEF"/>
+                    <Setter Property="Foreground" Value="#123D54"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridRow">
+            <Setter Property="MinHeight" Value="44"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#EDF6F7"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D9ECEF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="SelectionUnit" Value="FullRow"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F8FAFC"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#E7EEF2"/>
+            <Setter Property="CanUserReorderColumns" Value="False"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="24" x:Name="mainPanel">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer MaxHeight="350" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12">
+            <StackPanel>
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="商品検索" FontSize="26" FontWeight="SemiBold"/>
+                    <Button Content="← 商品管理へ戻る" Click="Back_Click" Style="{StaticResource EmployeeButtonStyle}" Margin="0,0,10,6" Grid.Column="1"/>
+                </Grid>
+                <Border Style="{StaticResource CardStyle}" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="検索条件" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,14,12" Width="185">
+                                <TextBlock Text="商品ID（前方一致）" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox x:Name="txtSearchId"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,14,12" Width="185">
+                                <TextBlock Text="商品名（部分一致）" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox MaxLength="50" x:Name="txtSearchName"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,14,12" Width="185">
+                                <TextBlock Text="メーカー" Style="{StaticResource FieldLabelStyle}"/>
+                                <ComboBox DisplayMemberPath="MaName" SelectedValuePath="MaId" x:Name="cmbMaker"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,14,12" Width="185">
+                                <TextBlock Text="大分類" Style="{StaticResource FieldLabelStyle}"/>
+                                <ComboBox DisplayMemberPath="McName" SelectedValuePath="McId" SelectionChanged="Major_SelectionChanged" x:Name="cmbMajor"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,14,12" Width="185">
+                                <TextBlock Text="小分類" Style="{StaticResource FieldLabelStyle}"/>
+                                <ComboBox DisplayMemberPath="ScName" SelectedValuePath="ScId" x:Name="cmbSmall"/>
+                            </StackPanel>
+                        </WrapPanel>
+                        <WrapPanel>
+                            <Button Content="検索" Click="Search_Click" Style="{StaticResource EmployeeButtonStyle}" Margin="0,0,10,6"/>
+                            <Button Content="一覧表示" Click="List_Click" Style="{StaticResource OutlineButtonStyle}" Margin="0,0,10,6"/>
+                        </WrapPanel>
+                        <!-- <TextBlock Text="入力した条件をすべて満たす商品を検索します。未選択の項目は条件に含めません。" TextWrapping="Wrap" Foreground="#718894" FontSize="12"/> -->
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Style="{StaticResource CardStyle}" Padding="0" Grid.Row="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Margin="18,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="検索結果" FontSize="16" FontWeight="SemiBold"/>
+                    <Button Content="選択した商品を編集" Click="Edit_Click" Style="{StaticResource EmployeeButtonStyle}" Margin="0,0,10,6" Grid.Column="1"/>
+                </Grid>
+                <DataGrid MinHeight="70" Margin="1,0,1,8" x:Name="gridProducts" Grid.Row="1" MouseDoubleClick="Products_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="商品ID" Binding="{Binding Id}" Width="85"/>
+                        <DataGridTextColumn Header="商品名" Binding="{Binding Name}" Width="*" MinWidth="150"/>
+                        <DataGridTextColumn Header="メーカー" Binding="{Binding Maker}" Width="150"/>
+                        <DataGridTextColumn Header="価格" Binding="{Binding Price, StringFormat=N0}" Width="110"/>
+                        <DataGridTextColumn Header="大分類" Binding="{Binding Major}" Width="120"/>
+                        <DataGridTextColumn Header="小分類" Binding="{Binding Small}" Width="120"/>
+                        <DataGridTextColumn Header="型番" Binding="{Binding Model}" Width="130"/>
+                        <DataGridTextColumn Header="色" Binding="{Binding Color}" Width="90"/>
+                        <DataGridTextColumn Header="発売日" Binding="{Binding ReleaseDate, StringFormat=yyyy/MM/dd}" Width="115"/>
+                        <DataGridTextColumn Header="安全在庫数" Binding="{Binding SafetyStock}" Width="95"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+        <Border Background="#E8F0F4" CornerRadius="6" Padding="12,9" Margin="0,12,0,0" Grid.Row="2">
+            <TextBlock TextWrapping="Wrap" x:Name="txtMessage"/>
+        </Border>
+    </Grid>
+</UserControl>

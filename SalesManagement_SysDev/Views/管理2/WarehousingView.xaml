@@ -1,0 +1,247 @@
+<UserControl x:Class="SalesManagement_SysDev.WarehousingView"
+
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+        xmlns:local="clr-namespace:SalesManagement_SysDev"
+
+        mc:Ignorable="d" d:DesignHeight="1080" d:DesignWidth="1920"
+        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+        FontFamily="{DynamicResource {x:Static SystemFonts.MessageFontFamilyKey}}"
+        FontSize="{DynamicResource {x:Static SystemFonts.MessageFontSizeKey}}"
+        Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
+        UseLayoutRounding="False" Loaded="View_Loaded"
+        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+
+
+
+    <Grid x:Name="mainPanel" Margin="15">
+
+        <Grid.RowDefinitions>
+
+            <!-- 1. 一番上: タイトル帯 (ヘッダーバー) -->
+
+            <RowDefinition Height="Auto"/>
+
+            <!-- 2. 操作ボタンエリア (登録、検索、一覧表示、非表示、確定) -->
+
+            <RowDefinition Height="Auto"/>
+
+            <!-- 3. 発注条件入力エリア (発注ID、発注日、取引先など) -->
+
+            <RowDefinition Height="Auto"/>
+
+            <!-- 4. 発注一覧 (リスト) 表示エリア -->
+
+            <RowDefinition Height="*"/>
+
+        </Grid.RowDefinitions>
+
+
+
+        <!-- ==========================================
+
+         1. タイトル帯 (ヘッダーバー)
+
+         ========================================== -->
+
+        <Border Grid.Row="0" Background="#005A9C" CornerRadius="5" Padding="15,10" Margin="0,0,0,10">
+
+            <DockPanel LastChildFill="False">
+
+                <TextBlock Text="入庫管理" FontSize="20" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+
+            </DockPanel>
+
+        </Border>
+
+
+
+        <!-- ==========================================
+
+         2. 操作ボタンバー
+
+         ========================================== -->
+
+        <Border Grid.Row="1" Background="White" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+
+                <Button Click="List_Click" Content="一覧表示" Width="100" Height="35" Margin="0,0,10,0" Background="#6C757D" Foreground="White" FontWeight="Bold"/>
+
+                <Button Click="Search_Click" Content="検索" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
+
+                <Button Click="Delete_Click" Content="削除" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
+
+                <Button Click="Hide_Click" Content="非表示" Width="100" Height="35" Margin="0,0,10,0" Background="#DC3545" Foreground="White" FontWeight="Bold"/>
+
+                <Button Click="Confirm_Click" Content="確定" Width="100" Height="35" Margin="0,0,10,0" Background="#28A745" Foreground="White" FontWeight="Bold"/>
+
+                <Button Click="Clear_Click" Content="クリア" Width="100" Height="35" Margin="0,0,10,0" Background="#6C757D"  Foreground="White" FontWeight="Bold"/>
+
+            </StackPanel>
+
+        </Border>
+
+
+
+        <!-- ==========================================
+        
+         3. 入庫条件選択・入力エリア 
+        
+        ========================================== -->
+        <Border Grid.Row="2" Background="White" BorderBrush="#005A9C" BorderThickness="1.5" CornerRadius="5" Padding="15" Margin="0,0,0,10">
+            <Grid>
+                <!-- 5つの入力グループに合わせて列定義を整理 (Column 0～13) -->
+                <Grid.ColumnDefinitions>
+                    <!-- 1グループ目: 入庫ID / 商品ID -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="15"/>
+                    <!-- 2グループ目: 発注ID / 数量 -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="15"/>
+                    <!-- 3グループ目: メーカ / 状態 -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="15"/>
+                    <!-- 4グループ目: 担当者 / 非表示理由 -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="15"/>
+                    <!-- 5グループ目: 発注日・期間指定 -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- 1行目 -->
+                    <RowDefinition Height="12"/>
+                    <!-- 行間余白 -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- 2行目 -->
+                </Grid.RowDefinitions>
+
+                <!-- 【1行目】ヘッダー基本情報 (5項目) -->
+                <!-- 入庫ID -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="入庫ID:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox MaxLength="10" x:Name="txtId" Grid.Row="0" Grid.Column="1" Height="30" VerticalContentAlignment="Center" Text=""/>
+
+                <!-- 発注ID -->
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="発注ID:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox MaxLength="10" x:Name="txtHattyuId" Grid.Row="0" Grid.Column="4" Height="30" VerticalContentAlignment="Center" Text=""/>
+
+                <!-- メーカ (ComboBox) -->
+                <TextBlock Grid.Row="0" Grid.Column="6" Text="メーカ:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <ComboBox DisplayMemberPath="Name" SelectedValuePath="Id" x:Name="cmbMaker" Grid.Row="0" Grid.Column="7" Height="30" VerticalContentAlignment="Center" SelectedIndex="0">
+                    
+                </ComboBox>
+
+                <!-- 担当者 (ComboBox) -->
+                <TextBlock Grid.Row="0" Grid.Column="9" Text="担当者:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <ComboBox DisplayMemberPath="Name" SelectedValuePath="Id" x:Name="cmbEmployee" Grid.Row="0" Grid.Column="10" Height="30" VerticalContentAlignment="Center" SelectedIndex="0">
+                    
+                </ComboBox>
+
+                <!-- 発注日・期間指定 -->
+                <TextBlock Grid.Row="0" Grid.Column="12" Text="入庫日・期間指定:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,10,0"/>
+                <StackPanel Grid.Row="0" Grid.Column="13" Orientation="Horizontal" VerticalAlignment="Center">
+                    <DatePicker x:Name="dpFrom" Width="125" Height="30" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="～" VerticalAlignment="Center" Margin="5,0"/>
+                    <DatePicker x:Name="dpTo" Width="125" Height="30" VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+
+                <!-- 【2行目】明細・ステータス情報 (4項目) -->
+                <!-- 商品ID -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="商品ID:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox MaxLength="10" x:Name="txtProductId" Grid.Row="2" Grid.Column="1" Height="30" VerticalContentAlignment="Center"/>
+
+                <!-- 数量 -->
+                <TextBlock Grid.Row="2" Grid.Column="3" Text="数量:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox MaxLength="10" x:Name="txtQuantity" Grid.Row="2" Grid.Column="4" Height="30" VerticalContentAlignment="Center"/>
+
+                <!-- 状態(ステータス) -->
+                <TextBlock Grid.Row="2" Grid.Column="6" Text="状態:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <ComboBox DisplayMemberPath="Name" SelectedValuePath="Value" x:Name="cmbState" Grid.Row="2" Grid.Column="7" Height="30" VerticalContentAlignment="Center" SelectedIndex="0">
+                    
+                </ComboBox>
+
+                <!-- 非表示理由 -->
+                <TextBlock Grid.Row="2" Grid.Column="9" Text="非表示理由:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox MaxLength="1000" x:Name="txtReason" Grid.Row="2" Grid.Column="10" Grid.ColumnSpan="4" Height="30" VerticalContentAlignment="Center" Text="" ToolTip="非表示にする際の理由を入力"/>
+
+            </Grid>
+        </Border>
+
+
+
+        <!-- ==========================================
+
+         4. 発注一覧 (リスト) 表示エリア
+
+         ========================================== -->
+
+        <Border Grid.Row="3" Background="White" CornerRadius="5" Padding="10">
+
+            <Grid>
+
+                <Grid.RowDefinitions>
+
+                    <RowDefinition Height="Auto"/>
+
+                    <RowDefinition Height="*"/>
+
+                </Grid.RowDefinitions>
+
+
+
+                <TextBlock Grid.Row="0" Text="■ 入庫データ一覧リスト" FontSize="16" FontWeight="Bold" Margin="0,0,0,10" Foreground="#005A9C"/>
+
+
+
+                <!-- データグリッド (指定いただいた列順に完全準拠) -->
+
+                <DataGrid x:Name="gridData" IsReadOnly="True" SelectionChanged="Data_SelectionChanged" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" 
+
+                      GridLinesVisibility="All" Background="White" HeadersVisibility="Column" RowHeight="32">
+
+                    <DataGrid.Columns>
+
+                        <DataGridTextColumn Header="入庫ID" Binding="{Binding WaID}" Width="120"/>
+
+                        <DataGridTextColumn Header="発注ID" Binding="{Binding HaID}" Width="120"/>
+
+                        <DataGridTextColumn Header="メーカ" Binding="{Binding Maker}" Width="190"/>
+
+                        <DataGridTextColumn Header="商品ID" Binding="{Binding PrID}" Width="120"/>
+
+                        <DataGridTextColumn Header="商品名" Binding="{Binding ProductName}" Width="190"/>
+
+                        <DataGridTextColumn Header="数量" Binding="{Binding WaQuantity}" Width="70"/>
+
+                        <DataGridTextColumn Header="入庫年月日" Binding="{Binding WaDate}" Width="120"/>
+
+                        <DataGridTextColumn Header="担当者" Binding="{Binding EmID}" Width="100"/>
+
+                        <DataGridTextColumn Header="処理状態" Binding="{Binding WaFlag}" Width="100"/>
+
+                        <DataGridTextColumn Header="備考" Binding="{Binding Status}" Width="120"/>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+            </Grid>
+
+        </Border>
+
+    </Grid>
+
+</UserControl> 
