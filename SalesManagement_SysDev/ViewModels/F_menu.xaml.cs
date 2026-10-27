@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Threading;
@@ -107,6 +108,8 @@ namespace SalesManagement_SysDev
 
         private bool CanLeaveScreen()
         {
+            if (screenHost.Content is SyukkoView syukko) return syukko.CanLeave();
+            if (screenHost.Content is SyukkoSearchView syukkoSearch) return syukkoSearch.CanLeave();
             if (screenHost.Content is ChumonView chumon) return chumon.CanLeave();
             if (screenHost.Content is ChumonSearchView chumonSearch) return chumonSearch.CanLeave();
             if (screenHost.Content is HattyuView hattyu) return hattyu.CanLeave();
@@ -131,7 +134,7 @@ namespace SalesManagement_SysDev
                 MessageBox.Show("この画面を利用する権限がありません。", "アクセス制限", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 同じ管理画面への再クリックでは作り直さない。
+            
             if ((name == "注文管理" && screenHost.Content is ChumonView) ||
                 (name == "出庫管理" && screenHost.Content is SyukkoView) ||
                 (name == "入荷管理" && screenHost.Content is ArrivalView) ||
@@ -187,11 +190,14 @@ namespace SalesManagement_SysDev
             {
                 var view = new ChumonView(_employee.EmId);
                 view.SearchRequested += (_, _) => OpenChumonSearch(view);
+                view.SyukkoRequested += syukkoId => OpenCreatedSyukkoAsync(view, syukkoId);
                 screenHost.Content = view;
             }
             else if (name == "出庫管理")
             {
-                screenHost.Content = new SyukkoView(_employee.EmId);
+                var view = new SyukkoView(_employee.EmId);
+                view.SearchRequested += (_, _) => OpenSyukkoSearch(view);
+                screenHost.Content = view;
             }
             else if (name == "入荷管理")
             {
@@ -255,23 +261,82 @@ namespace SalesManagement_SysDev
         private void OpenChumonSearch(ChumonView source)
         {
             if (!CanAccess("注文管理") || screenHost.Content != source || !source.CanLeave()) return;
-            var search = new ChumonSearchView(_employee.EmId, source.PreviewRows);
+            var search = new ChumonSearchView(_employee.EmId);
             search.BackRequested += (_, _) =>
             {
                 if (screenHost.Content != search || !search.CanLeave()) return;
                 screenHost.Content = source;
                 txtTitle.Text = "販売在庫管理システム　／　注文管理";
             };
-            search.DisplayRequested += chumonId =>
+            search.DisplayRequested += async chumonId =>
             {
-                if (!CanAccess("注文管理") || screenHost.Content != search || !search.CanLeave()) return false;
-                if (!source.OpenChumon(chumonId)) return false;
+                
+                if (!CanAccess("注文管理") || screenHost.Content != search) return false;
+                bool opened = await source.OpenChumonAsync(chumonId);
+                if (screenHost.Content != search) return false;
+                if (!opened)
+                {
+                    if (!string.IsNullOrWhiteSpace(source.DisplayLoadError))
+                        MessageBox.Show(source.DisplayLoadError, "注文情報の読み込み",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
                 screenHost.Content = source;
                 txtTitle.Text = "販売在庫管理システム　／　注文管理";
                 return true;
             };
             screenHost.Content = search;
             txtTitle.Text = "販売在庫管理システム　／　注文検索";
+        }
+
+        private void OpenSyukkoSearch(SyukkoView source)
+        {
+            if (!CanAccess("出庫管理") || screenHost.Content != source || !source.CanLeave()) return;
+            var search = new SyukkoSearchView(_employee.EmId);
+            search.BackRequested += (_, _) =>
+            {
+                if (screenHost.Content != search || !search.CanLeave()) return;
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　出庫管理";
+            };
+            search.DisplayRequested += async syukkoId =>
+            {
+
+                if (!CanAccess("出庫管理") || screenHost.Content != search) return false;
+                bool opened = await source.OpenSyukkoAsync(syukkoId);
+                if (screenHost.Content != search) return false;
+                if (!opened)
+                {
+                    if (!string.IsNullOrWhiteSpace(source.DisplayLoadError))
+                        MessageBox.Show(source.DisplayLoadError, "出庫情報の読み込み",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　出庫管理";
+                return true;
+            };
+            screenHost.Content = search;
+            txtTitle.Text = "販売在庫管理システム　／　出庫検索";
+        }
+
+        private async Task OpenCreatedSyukkoAsync(ChumonView source, int syukkoId)
+        {
+
+            if (screenHost.Content != source || !CanAccess("出庫管理")) return;
+            var view = new SyukkoView(_employee.EmId);
+            view.SearchRequested += (_, _) => OpenSyukkoSearch(view);
+            bool opened = await view.OpenSyukkoAsync(syukkoId);
+            if (!IsVisible || screenHost.Content != source) return;
+            if (!opened)
+            {
+                MessageBox.Show("注文確定は完了しています。出庫画面の表示に失敗しました。\n" + view.DisplayLoadError,
+                    "出庫情報の読み込み", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (!source.CanLeave()) return;
+            screenHost.Content = view;
+            txtTitle.Text = "販売在庫管理システム　／　出庫管理";
         }
 
         private void OpenOrderSearch(OrderView source)
@@ -405,7 +470,9 @@ namespace SalesManagement_SysDev
 
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {
-            if ((screenHost.Content is ChumonView chumon && chumon.IsBusy) ||
+            if ((screenHost.Content is SyukkoView syukko && syukko.IsBusy) ||
+                (screenHost.Content is SyukkoSearchView syukkoSearch && syukkoSearch.IsBusy) ||
+                (screenHost.Content is ChumonView chumon && chumon.IsBusy) ||
                 (screenHost.Content is ChumonSearchView chumonSearch && chumonSearch.IsBusy) ||
                 (screenHost.Content is HattyuView hattyu && hattyu.IsBusy) ||
                 (screenHost.Content is WarehousingView warehousing && warehousing.IsBusy) ||

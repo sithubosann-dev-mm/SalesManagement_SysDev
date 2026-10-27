@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="SalesManagement_SysDev.ChumonView" Background="#F0F5F8" Foreground="#123D54" FontFamily="Yu Gothic UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True">
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="SalesManagement_SysDev.ChumonView" Background="#F0F5F8" Foreground="#123D54" FontFamily="Yu Gothic UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True" Loaded="View_Loaded">
     <UserControl.Resources>
         <Style x:Key="Card" TargetType="Border">
             <Setter Property="Background" Value="White"/>
@@ -171,7 +171,7 @@
             <Setter Property="CanUserReorderColumns" Value="False"/>
         </Style>
     </UserControl.Resources>
-    <Grid Margin="24">
+    <Grid Margin="24" x:Name="mainPanel">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -208,11 +208,11 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="注文ID" Binding="{Binding Id}" Width="80"/>
                                 <DataGridTextColumn Header="受注ID" Binding="{Binding OrderId}" Width="80"/>
-                                <DataGridTextColumn Header="注文日" Binding="{Binding Date, StringFormat=yyyy/MM/dd}" Width="110"/>
+                                <DataGridTextColumn Header="注文日" Binding="{Binding Date, StringFormat=yyyy/MM/dd, TargetNullValue=未設定}" Width="110"/>
                                 <DataGridTextColumn Header="顧客" Binding="{Binding Client}" Width="*"/>
                                 <DataGridTextColumn Header="営業所" Binding="{Binding Office}" Width="130"/>
                                 <DataGridTextColumn Header="状態" Binding="{Binding State}" Width="90"/>
-                                <DataGridTextColumn Header="合計" Binding="{Binding Total, StringFormat=N0}" Width="130"/>
+                                <DataGridTextColumn Header="合計" Binding="{Binding Total, StringFormat=N0, TargetNullValue=—}" Width="130"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -232,7 +232,7 @@
                                 <DataGridTextColumn Header="商品ID" Binding="{Binding ProductId}" Width="90"/>
                                 <DataGridTextColumn Header="商品名" Binding="{Binding ProductName}" Width="*"/>
                                 <DataGridTextColumn Header="数量" Binding="{Binding Quantity}" Width="100"/>
-                                <DataGridTextColumn Header="金額" Binding="{Binding Total, StringFormat=N0}" Width="150"/>
+                                <DataGridTextColumn Header="金額" Binding="{Binding Total, StringFormat=N0, TargetNullValue=—}" Width="150"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -243,8 +243,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <WrapPanel Margin="0,12,0,0">
-                        <Button Content="非表示" Style="{StaticResource Danger}" Click="Hide_Click" Margin="0,0,10,6"/>
-                        <Button Content="注文確定 → 出庫管理" Style="{StaticResource Action}" Click="Confirm_Click" Margin="0,0,10,6"/>
+                        <Button Content="非表示" Style="{StaticResource Danger}" Margin="0,0,10,6" IsEnabled="False" ToolTip="この処理は準備中です。今回の接続範囲は注文の表示・検索です。" ToolTipService.ShowOnDisabled="True"/>
+                        <Button x:Name="btnConfirm" Content="注文確定 → 出庫管理" Click="Confirm_Click" Style="{StaticResource Action}" Margin="0,0,10,6" IsEnabled="False"/>
                     </WrapPanel>
                     <TextBlock Text="合計：—" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" x:Name="txtDetailTotal" Grid.Column="1"/>
                 </Grid>
@@ -254,7 +254,7 @@
             </Grid>
         </Grid>
         <Border Grid.Row="2" Background="#E8F0F4" CornerRadius="5" Padding="12,8" Margin="0,12,0,0">
-            <TextBlock x:Name="txtMessage" TextWrapping="Wrap" Text="画面サンプル・DB未接続。検索画面へボタンから注文を検索できます。"/>
+            <TextBlock x:Name="txtMessage" TextWrapping="Wrap" Text="注文情報を読み込みます。"/>
         </Border>
     </Grid>
 </UserControl>

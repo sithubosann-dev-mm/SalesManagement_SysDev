@@ -109,7 +109,7 @@ namespace SalesManagement_SysDev
                     Employee = x.Em.EmName,
                     EmployeeId = x.EmId,
                     Charge = x.ClCharge ?? "",
-                    StateFlag = x.OrFlag,
+                    StateFlag = x.OrStateFlag,
                     Total = x.TOrderDetails.Sum(d => (decimal?)d.OrTotalPrice) ?? 0m
                 }).ToListAsync();
             txtMessage.Text = $"{gridOrders.Items.Count}件が見つかりました。受注を選択して表示できます。";
@@ -179,7 +179,7 @@ namespace SalesManagement_SysDev
 
         private async void Orders_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            // A header or empty area double-click must not open the previously selected row.
+            
             var origin = e.OriginalSource as DependencyObject;
             var row = origin == null ? null : ItemsControl.ContainerFromElement(gridOrders, origin) as DataGridRow;
             if (row == null) return;
@@ -193,3 +193,4 @@ namespace SalesManagement_SysDev
         }
     }
 }
+

@@ -56,9 +56,15 @@ namespace SalesManagement_SysDev
             public string Employee { get; set; } = "";
             public int EmployeeId { get; set; }
             public string Charge { get; set; } = "";
-            public int StateFlag { get; set; }
+            public int? StateFlag { get; set; }
             public decimal Total { get; set; }
-            public string State => StateFlag == 0 ? "未確定" : "確定済";
+            public string State => StateFlag switch
+            {
+                0 => "未確定",
+                1 => "確定済",
+                null => "未設定",
+                _ => "不明"
+            };
         }
 
         public OrderView(int loginEmployeeId)
@@ -92,7 +98,7 @@ namespace SalesManagement_SysDev
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
         }
 
-        // メニュー表示、DBにもログイン社員の権限確認
+        // メニューshow
         private async Task CheckPermissionAsync(SalesManagementContext db)
         {
             bool allowed = await db.MEmployees.AsNoTracking().AnyAsync(x =>
@@ -261,7 +267,7 @@ namespace SalesManagement_SysDev
             txtMessage.Text = "登録フォームをクリアしました。";
         }
 
-        // 登録は受注と受注明細を同じ保存
+        // 登録は受注と受注を save
         private async void Save_Click(object sender, RoutedEventArgs e)
         {
             if (!CommitDraftEdits()) return;
@@ -315,7 +321,7 @@ namespace SalesManagement_SysDev
                     order.SoId = officeId;
                     order.OrDate = dpOrderDate.SelectedDate.Value.Date;
                     order.ClCharge = txtCharge.Text.Trim();
-                    // 登録社員は元の社員を維持する
+                    
                 }
                 else
                 {
@@ -379,7 +385,7 @@ namespace SalesManagement_SysDev
                     Employee = x.Em.EmName,
                     EmployeeId = x.EmId,
                     Charge = x.ClCharge ?? "",
-                    StateFlag = x.OrFlag,
+                    StateFlag = x.OrStateFlag,
                     Total = x.TOrderDetails.Sum(d => (decimal?)d.OrTotalPrice) ?? 0m
                 }).ToListAsync();
             txtMessage.Text = $"{gridOrders.Items.Count}件を表示しています。";
@@ -632,7 +638,7 @@ namespace SalesManagement_SysDev
             });
         }
 
-        // 確定保存、注文と注文明細の送信
+        // 確定保存、注文送信
         private async void Confirm_Click(object sender, RoutedEventArgs e)
         {
             if (gridOrders.SelectedItem is not OrderRow row || !_selectedId.HasValue)
@@ -652,7 +658,7 @@ namespace SalesManagement_SysDev
             await RunAsync(async () =>
             {
                 using var db = new SalesManagementContext();
-                // 同一受注の二重送信を、同時操作間でも防ぐ
+                
                 using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
                 await CheckPermissionAsync(db);
                 var order = await db.TOrders.SingleOrDefaultAsync(x => x.OrId == id && x.OrFlag == 0)
@@ -674,7 +680,7 @@ namespace SalesManagement_SysDev
                 };
                 db.TChumons.Add(chumon);
 
-                // EFメタデータでnullを確認
+                // nullを確認
                 if (db.Entry(chumon).Property("EmId").Metadata.IsNullable == false)
                     throw new InvalidOperationException("TChumon.EmIdがNULLを許可していません。設計書とDBモデルを確認してください。");
                 db.Entry(chumon).Property("EmId").CurrentValue = null;
@@ -694,3 +700,4 @@ namespace SalesManagement_SysDev
         }
     }
 }
+
