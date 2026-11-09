@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Data;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace SalesManagement_SysDev
                 txtMessage.Text = DisplayLoadError;
                 return false;
             }
-            finally { IsBusy = false; mainPanel.IsEnabled = true; }
+            finally { IsBusy = false; mainPanel.IsEnabled = true; UpdateActions(); }
         }
 
         private async void View_Loaded(object sender, RoutedEventArgs e)
@@ -98,6 +99,7 @@ namespace SalesManagement_SysDev
 
         private void UpdateDetails()
         {
+            UpdateActions();
             if (gridSyukkos.SelectedItem is SyukkoRow row)
             {
                 gridDetails.ItemsSource = row.Details;
@@ -117,6 +119,70 @@ namespace SalesManagement_SysDev
         private async void List_Click(object sender, RoutedEventArgs e) => await ReloadAsync();
         private void ShowSearch_Click(object sender, RoutedEventArgs e)
         { if (!IsBusy) SearchRequested?.Invoke(this, EventArgs.Empty); }
+
+        private void UpdateActions()
+        {
+            if (btnConfirm != null)
+                btnConfirm.IsEnabled = !IsBusy && gridSyukkos.SelectedItem is SyukkoRow row && row.RawState == 0;
+        }
+
+        private async void Confirm_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsBusy || gridSyukkos.SelectedItem is not SyukkoRow row || row.RawState != 0) return;
+            int id = row.Id;
+            if (MessageBox.Show($"出庫ID：{id} を確定しますか？\n営業所への発送を確認してください。入荷伝票を作成します。在庫数量は変更しません。",
+                "出庫確定", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+            await RunAsync(async () =>
+            {
+                int arrivalId;
+                using (var db = new SalesManagementContext())
+                {
+                    await CheckPermissionAsync(db, _loginEmployeeId);
+                    using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+                    var syukko = await db.TSyukkos.Include(x => x.TSyukkoDetails)
+                        .SingleOrDefaultAsync(x => x.SyId == id);
+                    if (syukko == null || syukko.SyFlag != 0 || syukko.SyStateFlag != 0)
+                        throw new InvalidOperationException("対象は更新済み、非表示、または未確定ではありません。一覧を更新してください。");
+                    if (syukko.TSyukkoDetails.Count == 0 || syukko.TSyukkoDetails.Any(d => d.PrId <= 0 || d.SyQuantity <= 0))
+                        throw new InvalidOperationException("商品または数量が不正な出庫明細があります。元データを確認してください。");
+                    // Arrival has no Syukko FK. The current workflow permits one arrival per order.
+                    // Include hidden records in duplicate checks.
+                    if (await db.TArrivals.AnyAsync(x => x.OrId == syukko.OrId) ||
+                        await db.TShipments.AnyAsync(x => x.OrId == syukko.OrId))
+                        throw new InvalidOperationException("この受注の入荷または出荷伝票が既に存在します。重複作成せずに中止しました。");
+                    var arrival = new TArrival
+                    {
+                        OrId = syukko.OrId, ClId = syukko.ClId, SoId = syukko.SoId,
+                        EmId = null, ArDate = null, ArStateFlag = 0, ArFlag = 0, ArHidden = null
+                    };
+                    foreach (var detail in syukko.TSyukkoDetails)
+                        arrival.TArrivalDetails.Add(new TArrivalDetail
+                        {
+                            PrId = detail.PrId, ArQuantity = detail.SyQuantity
+                        });
+                    db.TArrivals.Add(arrival);
+                    syukko.SyDate = DateTime.Today;
+                    syukko.EmId = _loginEmployeeId;
+                    syukko.SyStateFlag = 1;
+                    await db.SaveChangesAsync();
+                    await tx.CommitAsync();
+                    arrivalId = arrival.ArId;
+                }
+                string success = $"出庫ID：{id} を確定しました。入荷ID：{arrivalId} を作成しました。営業担当または管理者が入荷管理で確認してください。";
+                gridSyukkos.ItemsSource = null;
+                UpdateDetails();
+                try
+                {
+                    using var db = new SalesManagementContext();
+                    BindRows(await ReadRowsAsync(db, _loginEmployeeId, new SyukkoFilter()), id);
+                    txtMessage.Text = success;
+                }
+                catch (Exception ex)
+                {
+                    txtMessage.Text = success + "\n保存は完了しています。一覧の再表示に失敗しました。「一覧表示」で更新してください。\n" + ReadError(ex);
+                }
+            });
+        }
 
         internal static async Task CheckPermissionAsync(SalesManagementContext db, int loginId)
         {
@@ -212,7 +278,7 @@ namespace SalesManagement_SysDev
             string message = System.Text.RegularExpressions.Regex.Replace(cause.Message,
                 @"(?i)(password|pwd)\s*=\s*(?:""[^""]*""|'[^']*'|[^;\r\n]*)", "$1=***");
             if (message.Length > 1200) message = message.Substring(0, 1200);
-            return "出庫情報を取得できませんでした。" + ConnectionLabel() + "\n" + message;
+            return "出庫処理に失敗しました。" + ConnectionLabel() + "\n" + message;
         }
 
         public sealed class SyukkoRow

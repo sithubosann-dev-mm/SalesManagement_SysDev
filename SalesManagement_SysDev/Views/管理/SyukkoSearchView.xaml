@@ -238,7 +238,7 @@
                                     <ComboBoxItem Content="すべて"/>
                                     <ComboBoxItem Content="未出庫"/>
                                     <ComboBoxItem Content="出庫済"/>
-                                    <ComboBoxItem Content="未設定"/>
+                                   
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Margin="0,0,14,10" Width="190">

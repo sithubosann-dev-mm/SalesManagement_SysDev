@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace SalesManagement_SysDev
 {
@@ -23,7 +24,41 @@ namespace SalesManagement_SysDev
         public WarehousingView(int loginEmployeeId)
         {
             InitializeComponent(); _loginId = loginEmployeeId;
+            WireButtonUpdates();
+            UpdateButtons();
         }
+
+        private void WireButtonUpdates()
+        {
+            foreach (var input in new TextBox[] { txtId, txtProductId, txtQuantity, txtReason, txtHattyuId })
+                input.TextChanged += (_, _) => UpdateButtons();
+            foreach (var choice in new ComboBox[] { cmbMaker, cmbEmployee, cmbState })
+                choice.SelectionChanged += (_, _) => UpdateButtons();
+            foreach (var picker in new DatePicker[] { dpFrom, dpTo })
+            {
+                picker.SelectedDateChanged += (_, _) => UpdateButtons();
+                picker.AddHandler(TextBoxBase.TextChangedEvent,
+                    new TextChangedEventHandler((_, _) => UpdateButtons()));
+            }
+        }
+
+        private void UpdateButtons()
+        {
+            if (_loading || _restoring) return;
+            bool idle = !IsBusy;
+            // Keep read actions available after a failed initial load so the user can retry.
+            btnList.IsEnabled = idle;
+            btnSearch.IsEnabled = idle;
+            btnClear.IsEnabled = idle;
+            btnDelete.IsEnabled = false;
+            btnHide.IsEnabled = false; // Non-display rules will be aligned separately.
+            btnConfirm.IsEnabled = _initialized && idle && _selected != null &&
+                ReferenceEquals(gridData.SelectedItem, _selected) &&
+                txtId.Text.Trim() == _selected.WaID.ToString() && _selected.RawState == 0;
+
+        }
+
+
         private static bool Ask(string question, string title = "確認") =>
             MessageBox.Show(question, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
         public bool CanLeave()
@@ -34,14 +69,14 @@ namespace SalesManagement_SysDev
         private async Task RunAsync(Func<Task> action)
         {
             if (IsBusy) return;
-            IsBusy = true; mainPanel.IsEnabled = false;
+            IsBusy = true; mainPanel.IsEnabled = false; UpdateButtons();
             try { await action(); }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
                 MessageBox.Show(ErrorMessage(ex), "入庫管理", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            finally { IsBusy = false; mainPanel.IsEnabled = true; }
+            finally { IsBusy = false; mainPanel.IsEnabled = true; UpdateButtons(); }
         }
         private async void View_Loaded(object sender, RoutedEventArgs e)
         {
@@ -68,7 +103,7 @@ namespace SalesManagement_SysDev
                 ResetInputs(true);
                 cmbState.SelectedIndex = 2; // すべて
             }
-            finally { _loading = false; }
+            finally { _loading = false; UpdateButtons(); }
             await LoadRowsAsync(ReadFilter());
             _initialized = true; _baseline = FormStamp();
         }
@@ -114,14 +149,14 @@ namespace SalesManagement_SysDev
                 dpFrom.SelectedDate = null;
                 dpTo.SelectedDate = null; _baseline = FormStamp();
             }
-            finally { _loading = false; }
+            finally { _loading = false; UpdateButtons(); }
         }
         private async Task LoadRowsAsync(ReceivingFilter filter, bool reportEmpty = true)
         {
             var rows = await GetWarehousingsAsync(_loginId, filter);
             _loading = true;
             try { _selected = null; gridData.ItemsSource = rows; gridData.ToolTip = $"表示件数：{rows.Count}明細"; }
-            finally { _loading = false; }
+            finally { _loading = false; UpdateButtons(); }
             _baseline = FormStamp();
             if (rows.Count == 0 && reportEmpty)
                 MessageBox.Show(await EmptyResultMessageAsync(_loginId), "表示データの確認",
@@ -141,7 +176,9 @@ namespace SalesManagement_SysDev
         { if (CanLeave()) ResetInputs(false); }
         private void Data_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_loading || _restoring || IsBusy || gridData.SelectedItem is not WarehousingDisplayRow row) return;
+            if (_loading || _restoring || IsBusy) return;
+            if (gridData.SelectedItem is not WarehousingDisplayRow row)
+            { _selected = null; UpdateButtons(); return; }
             if (ReferenceEquals(row, _selected)) return;
             if (!CanLeave())
             {
@@ -159,7 +196,7 @@ namespace SalesManagement_SysDev
                 txtHattyuId.Text = row.HaID.ToString();
                 _baseline = FormStamp();
             }
-            finally { _loading = false; }
+            finally { _loading = false; UpdateButtons(); }
         }
         private WarehousingDisplayRow RequireSelected()
         {
@@ -378,7 +415,7 @@ namespace SalesManagement_SysDev
                 if (stock == null) { stock = new TStock { PrId = group.Key, StFlag = 0 }; db.TStocks.Add(stock); }
                 stock.StQuantity = (int)next;
             }
-            w.WaShelfFlag = 1; w.EmId = loginId;
+            w.WaShelfFlag = 1; w.EmId = loginId; w.WaDate = DateTime.Today;
             await db.SaveChangesAsync(); await tx.CommitAsync();
         }
 

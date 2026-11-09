@@ -1,4 +1,4 @@
-<UserControl x:Class="SalesManagement_SysDev.HattyuView"
+﻿<UserControl x:Class="SalesManagement_SysDev.HattyuView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -38,13 +38,13 @@
              ========================================== -->
         <Border Grid.Row="1" Background="White" CornerRadius="5" Padding="10" Margin="0,0,0,10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Click="List_Click" Content="一覧表示" Width="100" Height="35" Margin="0,0,10,0" Background="#6C757D" Foreground="White" FontWeight="Bold"/>
-                <Button Click="Search_Click" Content="検索" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
-                <Button Click="Register_Click" Content="登録" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
-                <Button Click="Delete_Click" Content="削除" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
-                <Button Click="Hide_Click" Content="非表示" Width="100" Height="35" Margin="0,0,10,0" Background="#DC3545" Foreground="White" FontWeight="Bold"/>
-                <Button Click="Confirm_Click" Content="確定" Width="100" Height="35" Margin="0,0,10,0" Background="#28A745" Foreground="White" FontWeight="Bold"/>
-                <Button Click="Clear_Click" Content="クリア" Width="100" Height="35" Margin="0,0,10,0" Background="#6C757D"  Foreground="White" FontWeight="Bold"/>
+                <Button x:Name="btnList" Click="List_Click" Content="一覧表示" Width="100" Height="35" Margin="0,0,10,0" Background="#6C757D" Foreground="White" FontWeight="Bold"/>
+                <Button x:Name="btnSearch" Click="Search_Click" Content="検索" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
+                <Button x:Name="btnRegister" IsEnabled="False" Click="Register_Click" Content="登録" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
+                <Button x:Name="btnDelete" IsEnabled="False" ToolTip="この画面では削除できません。" ToolTipService.ShowOnDisabled="True" Click="Delete_Click" Content="削除" Width="100" Height="35" Margin="0,0,10,0" Background="#005A9C" Foreground="White" FontWeight="Bold"/>
+                <Button x:Name="btnHide" IsEnabled="False" ToolTip="非表示機能は調整中です。" ToolTipService.ShowOnDisabled="True" Click="Hide_Click" Content="非表示" Width="100" Height="35" Margin="0,0,10,0" Background="#DC3545" Foreground="White" FontWeight="Bold"/>
+                <Button x:Name="btnConfirm" IsEnabled="False" ToolTip="未処理の伝票を選択してください。" ToolTipService.ShowOnDisabled="True" Click="Confirm_Click" Content="確定" Width="100" Height="35" Margin="0,0,10,0" Background="#28A745" Foreground="White" FontWeight="Bold"/>
+                <Button x:Name="btnClear" Click="Clear_Click" Content="クリア" Width="100" Height="35" Margin="0,0,10,0" Background="#6C757D"  Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Border>
 

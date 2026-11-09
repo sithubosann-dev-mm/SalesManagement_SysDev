@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Globalization;
@@ -108,6 +108,12 @@ namespace SalesManagement_SysDev
 
         private bool CanLeaveScreen()
         {
+            if (screenHost.Content is SaleView sale) return sale.CanLeave();
+            if (screenHost.Content is SaleSearchView saleSearch) return saleSearch.CanLeave();
+            if (screenHost.Content is ShipmentView shipment) return shipment.CanLeave();
+            if (screenHost.Content is ShipmentSearchView shipmentSearch) return shipmentSearch.CanLeave();
+            if (screenHost.Content is ArrivalView arrival) return arrival.CanLeave();
+            if (screenHost.Content is ArrivalSearchView arrivalSearch) return arrivalSearch.CanLeave();
             if (screenHost.Content is SyukkoView syukko) return syukko.CanLeave();
             if (screenHost.Content is SyukkoSearchView syukkoSearch) return syukkoSearch.CanLeave();
             if (screenHost.Content is ChumonView chumon) return chumon.CanLeave();
@@ -201,15 +207,21 @@ namespace SalesManagement_SysDev
             }
             else if (name == "入荷管理")
             {
-                screenHost.Content = new ArrivalView(_employee.EmId);
+                var view = new ArrivalView(_employee.EmId);
+                view.SearchRequested += (_, _) => OpenArrivalSearch(view);
+                screenHost.Content = view;
             }
             else if (name == "出荷管理")
             {
-                screenHost.Content = new ShipmentView(_employee.EmId);
+                var view = new ShipmentView(_employee.EmId);
+                view.SearchRequested += (_, _) => OpenShipmentSearch(view);
+                screenHost.Content = view;
             }
             else if (name == "売上管理")
             {
-                screenHost.Content = new SaleView(_employee.EmId);
+                var view = new SaleView(_employee.EmId);
+                view.SearchRequested += (_, _) => OpenSaleSearch(view);
+                screenHost.Content = view;
             }
             else
             {
@@ -318,6 +330,99 @@ namespace SalesManagement_SysDev
             };
             screenHost.Content = search;
             txtTitle.Text = "販売在庫管理システム　／　出庫検索";
+        }
+
+        private void OpenArrivalSearch(ArrivalView source)
+        {
+            if (!CanAccess("入荷管理") || screenHost.Content != source || !source.CanLeave()) return;
+            var search = new ArrivalSearchView(_employee.EmId);
+            search.BackRequested += (_, _) =>
+            {
+                if (screenHost.Content != search || !search.CanLeave()) return;
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　入荷管理";
+            };
+            search.DisplayRequested += async arrivalId =>
+            {
+
+                if (!CanAccess("入荷管理") || screenHost.Content != search) return false;
+                bool opened = await source.OpenArrivalAsync(arrivalId);
+                if (screenHost.Content != search) return false;
+                if (!opened)
+                {
+                    if (!string.IsNullOrWhiteSpace(source.DisplayLoadError))
+                        MessageBox.Show(source.DisplayLoadError, "入荷情報の読み込み",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　入荷管理";
+                return true;
+            };
+            screenHost.Content = search;
+            txtTitle.Text = "販売在庫管理システム　／　入荷検索";
+        }
+
+        private void OpenShipmentSearch(ShipmentView source)
+        {
+            if (!CanAccess("出荷管理") || screenHost.Content != source || !source.CanLeave()) return;
+            var search = new ShipmentSearchView(_employee.EmId);
+            search.BackRequested += (_, _) =>
+            {
+                if (screenHost.Content != search || !search.CanLeave()) return;
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　出荷管理";
+            };
+            search.DisplayRequested += async shipmentId =>
+            {
+
+                if (!CanAccess("出荷管理") || screenHost.Content != search) return false;
+                bool opened = await source.OpenShipmentAsync(shipmentId);
+                if (screenHost.Content != search) return false;
+                if (!opened)
+                {
+                    if (!string.IsNullOrWhiteSpace(source.DisplayLoadError))
+                        MessageBox.Show(source.DisplayLoadError, "出荷情報の読み込み",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　出荷管理";
+                return true;
+            };
+            screenHost.Content = search;
+            txtTitle.Text = "販売在庫管理システム　／　出荷検索";
+        }
+
+        private void OpenSaleSearch(SaleView source)
+        {
+            if (!CanAccess("売上管理") || screenHost.Content != source || !source.CanLeave()) return;
+            var search = new SaleSearchView(_employee.EmId);
+            search.BackRequested += (_, _) =>
+            {
+                if (screenHost.Content != search || !search.CanLeave()) return;
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　売上管理";
+            };
+            search.DisplayRequested += async saleId =>
+            {
+
+                if (!CanAccess("売上管理") || screenHost.Content != search) return false;
+                bool opened = await source.OpenSaleAsync(saleId);
+                if (screenHost.Content != search) return false;
+                if (!opened)
+                {
+                    if (!string.IsNullOrWhiteSpace(source.DisplayLoadError))
+                        MessageBox.Show(source.DisplayLoadError, "売上情報の読み込み",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                screenHost.Content = source;
+                txtTitle.Text = "販売在庫管理システム　／　売上管理";
+                return true;
+            };
+            screenHost.Content = search;
+            txtTitle.Text = "販売在庫管理システム　／　売上検索";
         }
 
         private async Task OpenCreatedSyukkoAsync(ChumonView source, int syukkoId)
@@ -470,7 +575,13 @@ namespace SalesManagement_SysDev
 
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {
-            if ((screenHost.Content is SyukkoView syukko && syukko.IsBusy) ||
+            if ((screenHost.Content is SaleView sale && sale.IsBusy) ||
+                (screenHost.Content is SaleSearchView saleSearch && saleSearch.IsBusy) ||
+                (screenHost.Content is ShipmentView shipment && shipment.IsBusy) ||
+                (screenHost.Content is ShipmentSearchView shipmentSearch && shipmentSearch.IsBusy) ||
+                (screenHost.Content is ArrivalView arrival && arrival.IsBusy) ||
+                (screenHost.Content is ArrivalSearchView arrivalSearch && arrivalSearch.IsBusy) ||
+                (screenHost.Content is SyukkoView syukko && syukko.IsBusy) ||
                 (screenHost.Content is SyukkoSearchView syukkoSearch && syukkoSearch.IsBusy) ||
                 (screenHost.Content is ChumonView chumon && chumon.IsBusy) ||
                 (screenHost.Content is ChumonSearchView chumonSearch && chumonSearch.IsBusy) ||
