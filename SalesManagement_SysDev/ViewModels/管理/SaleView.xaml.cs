@@ -156,7 +156,7 @@ namespace SalesManagement_SysDev
 
         private async Task RefreshAfterSaveAsync(int? selectedId, string success)
         {
-            // A failed refresh must not report a committed write as failed.
+          
             gridSales.ItemsSource = null;
             UpdateDetails();
             try

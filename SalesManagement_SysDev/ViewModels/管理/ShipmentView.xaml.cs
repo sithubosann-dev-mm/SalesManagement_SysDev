@@ -147,12 +147,10 @@ namespace SalesManagement_SysDev
                         throw new InvalidOperationException("対象は更新済み、非表示、または未確定ではありません。一覧を更新してください。");
                     if (shipment.TShipmentDetails.Count == 0 || shipment.TShipmentDetails.Any(d => d.PrId <= 0 || d.ShQuantity <= 0))
                         throw new InvalidOperationException("商品または数量が不正な出荷明細があります。元データを確認してください。");
-                    // Sale has no Shipment FK: one sale per received order in this workflow.
-                    // Include hidden records so hiding cannot cause duplicate sales.
+                    
                     if (await db.TSales.AnyAsync(x => x.OrId == shipment.OrId))
                         throw new InvalidOperationException("この受注の売上伝票は既に存在します。重複作成せずに中止しました。");
 
-                    // Use the order's agreed amounts, never the current product price.
                     var orderLines = await db.TOrderDetails.AsNoTracking()
                         .Where(x => x.OrId == shipment.OrId)
                         .Select(x => new { x.PrId, x.OrQuantity, x.OrTotalPrice }).ToListAsync();
@@ -227,7 +225,6 @@ namespace SalesManagement_SysDev
 
         private async Task RefreshAfterSaveAsync(int? selectedId, string success)
         {
-            // A failed refresh must not report a committed write as failed.
             gridShipments.ItemsSource = null;
             UpdateDetails();
             try

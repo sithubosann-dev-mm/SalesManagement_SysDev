@@ -98,7 +98,7 @@ namespace SalesManagement_SysDev
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
         }
 
-        // メニューshow
+       
         private async Task CheckPermissionAsync(SalesManagementContext db)
         {
             bool allowed = await db.MEmployees.AsNoTracking().AnyAsync(x =>
@@ -267,7 +267,7 @@ namespace SalesManagement_SysDev
             txtMessage.Text = "登録フォームをクリアしました。";
         }
 
-        // 登録は受注と受注を save
+        
         private async void Save_Click(object sender, RoutedEventArgs e)
         {
             if (!CommitDraftEdits()) return;
@@ -638,7 +638,7 @@ namespace SalesManagement_SysDev
             });
         }
 
-        // 確定保存、注文送信
+        
         private async void Confirm_Click(object sender, RoutedEventArgs e)
         {
             if (gridOrders.SelectedItem is not OrderRow row || !_selectedId.HasValue)
@@ -680,7 +680,7 @@ namespace SalesManagement_SysDev
                 };
                 db.TChumons.Add(chumon);
 
-                // nullを確認
+              
                 if (db.Entry(chumon).Property("EmId").Metadata.IsNullable == false)
                     throw new InvalidOperationException("TChumon.EmIdがNULLを許可していません。設計書とDBモデルを確認してください。");
                 db.Entry(chumon).Property("EmId").CurrentValue = null;

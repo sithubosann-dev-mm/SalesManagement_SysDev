@@ -140,7 +140,7 @@ namespace SalesManagement_SysDev
                 using (var db = new SalesManagementContext())
                 {
                     await CheckPermissionAsync(db, _loginEmployeeId);
-                    // Lock the read/check/write sequence, including the duplicate check.
+                   
                     using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
                     var arrival = await db.TArrivals.Include(x => x.TArrivalDetails)
                         .SingleOrDefaultAsync(x => x.ArId == id);
@@ -149,8 +149,7 @@ namespace SalesManagement_SysDev
                     if (arrival.TArrivalDetails.Count == 0 || arrival.TArrivalDetails.Any(d =>
                         !d.PrId.HasValue || d.PrId.Value <= 0 || !d.ArQuantity.HasValue || d.ArQuantity.Value <= 0))
                         throw new InvalidOperationException("商品または数量が不正な入荷明細があります。元データを確認してください。");
-                    // Shipment has no Arrival FK: this project uses one shipment per received order.
-                    // Include hidden shipments to avoid producing duplicates after hiding a record.
+                    
                     if (await db.TShipments.AnyAsync(x => x.OrId == arrival.OrId))
                         throw new InvalidOperationException("この受注の出荷伝票は既に存在します。重複作成せずに中止しました。");
                     var shipment = new TShipment
@@ -206,7 +205,7 @@ namespace SalesManagement_SysDev
 
         private async Task RefreshAfterSaveAsync(int? selectedId, string success)
         {
-            // A failed refresh must not report a committed write as failed.
+            
             gridArrivals.ItemsSource = null;
             UpdateDetails();
             try

@@ -145,8 +145,7 @@ namespace SalesManagement_SysDev
                         throw new InvalidOperationException("対象は更新済み、非表示、または未確定ではありません。一覧を更新してください。");
                     if (syukko.TSyukkoDetails.Count == 0 || syukko.TSyukkoDetails.Any(d => d.PrId <= 0 || d.SyQuantity <= 0))
                         throw new InvalidOperationException("商品または数量が不正な出庫明細があります。元データを確認してください。");
-                    // Arrival has no Syukko FK. The current workflow permits one arrival per order.
-                    // Include hidden records in duplicate checks.
+                  
                     if (await db.TArrivals.AnyAsync(x => x.OrId == syukko.OrId) ||
                         await db.TShipments.AnyAsync(x => x.OrId == syukko.OrId))
                         throw new InvalidOperationException("この受注の入荷または出荷伝票が既に存在します。重複作成せずに中止しました。");
